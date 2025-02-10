@@ -4,7 +4,7 @@ module Main where
 
 --------------------------------------------------------------------------------
 
-import Control.Monad.State
+import Control.Monad (foldM)
 import Data.Bool (bool)
 import Data.Foldable (find, sequenceA_)
 import Data.Maybe (fromMaybe)

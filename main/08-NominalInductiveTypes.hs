@@ -9,7 +9,7 @@ module Main where
 
 --------------------------------------------------------------------------------
 
-import Control.Applicative (liftA2)
+import Control.Monad (foldM, when, zipWithM)
 import Control.Arrow ((&&&))
 import Control.Monad.Except (MonadError (..))
 import Control.Monad.Identity

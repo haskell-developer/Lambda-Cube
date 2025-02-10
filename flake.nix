@@ -2,23 +2,14 @@
   description = "Single file Lambda Calculus implementations and presentation slides.";
 
   inputs = {
-    # Nix Inputs
-    nixpkgs.url = github:nixos/nixpkgs/23.05;
+    nixpkgs.url = github:nixos/nixpkgs/24.05;
     flake-utils.url = github:numtide/flake-utils;
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , flake-utils
-    ,
-    }:
+  outputs = { self , nixpkgs , flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
     let
-      utils = flake-utils.lib;
-    in
-    utils.eachDefaultSystem (system:
-    let
-      compilerVersion = "ghc927";
+      compilerVersion = "ghc982";
       pkgs = nixpkgs.legacyPackages.${system};
       hsPkgs = pkgs.haskell.packages.${compilerVersion}.override {
         overrides = hfinal: hprev: {
@@ -28,30 +19,30 @@
     in
     rec {
       packages =
-        utils.flattenTree
-          { lambda-calculus-hs = hsPkgs.lambda-calculus-hs; };
+        flake-utils.lib.flattenTree
+          { lambda-calculus-hs = hsPkgs.lambda-calculus-hs;
+            default = hsPkgs.lambda-calculus-hs;
+          };
 
-      # nix develop
-      devShell = hsPkgs.shellFor {
-        withHoogle = true;
-        packages = p: [
-          p.lambda-calculus-hs
-        ];
-        buildInputs = with pkgs;
-          [
-            hsPkgs.haskell-language-server
-            haskellPackages.cabal-install
-            cabal2nix
-            haskellPackages.ghcid
-            haskellPackages.fourmolu
-            haskellPackages.cabal-fmt
-            nodePackages.serve
-            nixpkgs-fmt
-          ]
-          ++ (builtins.attrValues (import ./scripts.nix { s = pkgs.writeShellScriptBin; }));
+      devShells = {
+        default = hsPkgs.shellFor {
+          withHoogle = true;
+          packages = p: [
+            p.lambda-calculus-hs
+          ];
+          buildInputs = with pkgs;
+            [
+              cabal-install
+              cabal2nix
+              haskell-language-server
+              haskellPackages.ghcid
+              haskellPackages.fourmolu
+              haskellPackages.cabal-fmt
+            ]
+            ++ (builtins.attrValues (import ./scripts.nix { s = pkgs.writeShellScriptBin; }));
+          };
       };
 
-      # nix build
-      defaultPackage = packages.lambda-calculus-hs;
+      formatter = pkgs.nixfmt-rfc-style;
     });
 }

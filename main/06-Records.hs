@@ -5,7 +5,7 @@ module Main where
 
 --------------------------------------------------------------------------------
 
-import Control.Applicative (liftA2)
+import Control.Monad (foldM)
 import Control.Arrow ((&&&))
 import Control.Monad.Except (MonadError (..))
 import Control.Monad.Identity
